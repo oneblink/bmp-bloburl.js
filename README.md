@@ -36,5 +36,34 @@ This will output:
 
 - TODO: ...
 
+## Compatibility
+
+Below is a table of built-in (un-polyfilled) support for W3C standards.
+
+browser              | URL | Blob | FileReader
+-------------------- | --- | ---- | ---
+Chrome               | yes | yes  | yes
+Firefox              | yes | yes  | yes
+Safari 6             | no  | yes  | yes
+Safari 5             | no  | yes* | yes
+Internet Explorer 10 | no  | yes  | yes
+Internet Explorer 9  | no  | no   | no
+
+Note: Safari 5 supports an early version of Blob that cannot be directly constructed.
+
+## Test Scenarios
+
+When `grunt` executes these scenarios, it uses PhantomJS (a headless WebKit). As it stands, PhantomJS does not have full support for the W3C standards at issue.
+
+As such, it is recommended that you manually run each test in Chrome or Firefox. The tests are authored such that they simulate non-conformance even in a fully-conforming browser.
+
+1. URL, Blob and FileReader all fully conformant with W3C specifications
+2. as above but with URL either undefined or lacking create|revokeObjectURL
+3. as above but with Blob unable to be directly constructed
+4. no support for URL, Blob or FileReader
+
+The different `index.html` test files neuter the environment to test different levels of conformance. The shared `test.js` file is deliberately the same, so that the same tests are run across multiple browsers.
+
+It is also recommended that the tests be executed in the browsers listed above, for sanity.
 
 

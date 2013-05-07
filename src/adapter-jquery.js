@@ -8,7 +8,7 @@
     oldAjax,
     newAjax,
     retrieveViaFileReader,
-    retrieveViaBMP;
+    retrieveViaBMPBlob;
 
   if (!$) {
     return; // no jQuery to be adapted
