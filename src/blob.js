@@ -86,5 +86,4 @@
 
   window.BMP = window.BMP || {};
   window.BMP.Blob = Blob;
-  window.Blob = window.Blob || Blob;
 }(this));

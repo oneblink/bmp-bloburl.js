@@ -18,7 +18,7 @@ module.exports = function (grunt) {
   grunt.initConfig({
     clean: {
       options: {
-        src: ['bmp-blob-jquery.*']
+        src: ['bmp-bloburl-jquery.*']
       }
     },
 
@@ -49,23 +49,22 @@ module.exports = function (grunt) {
       dist: {
         src: [
           'src/blob.js',
-          'src/file.js',
           'src/url.js',
           'src/filereader.js',
           'src/adapter-jquery.js'
         ],
-        dest: 'bmp-blob-jquery.js'
+        dest: 'bmp-bloburl-jquery.js'
       }
     },
 
     uglify: {
       'default': {
         files: {
-          'bmp-blob-jquery.min.js': ['bmp-blob-jquery.js']
+          'bmp-bloburl-jquery.min.js': ['bmp-bloburl-jquery.js']
         }
       },
       options: {
-        sourceMap: 'bmp-blob-jquery.js.map',
+        sourceMap: 'bmp-bloburl-jquery.js.map',
         preserveComments: 'some',
         beautify: {
           max_line_len: 80

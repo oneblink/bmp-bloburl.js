@@ -4,6 +4,8 @@ This library attempts to poly-fill interesting parts of the [W3C File API](http:
 
 That said, this library doesn't attempt much. We just try to cover functionality that can be covered in a cross-browser fashion. Most of the tricky stuff we leave to braver folk.
 
+FileReader support in the browser is assumed. That is, the library is not written to poly-fill FileReader and requires it to function.
+
 ## Instructions
 
 ## Prerequisities
@@ -60,7 +62,6 @@ As such, it is recommended that you manually run each test in Chrome or Firefox.
 1. URL, Blob and FileReader all fully conformant with W3C specifications
 2. as above but with URL either undefined or lacking create|revokeObjectURL
 3. as above but with Blob unable to be directly constructed
-4. no support for URL, Blob or FileReader
 
 The different `index.html` test files neuter the environment to test different levels of conformance. The shared `test.js` file is deliberately the same, so that the same tests are run across multiple browsers.
 
