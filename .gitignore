@@ -1,4 +1,6 @@
 /bmp*.js*
 /build
 node_modules
-.idea
+
+/.idea
+/*.iml
