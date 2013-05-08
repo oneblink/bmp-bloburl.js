@@ -1,10 +1,22 @@
 # BMP Blob.JS
 
-This library attempts to poly-fill interesting parts of the [W3C File API](http://www.w3.org/TR/FileAPI/) in a seemless way. That is, you ought to be able to use the covered APIs in the W3C specified manner and everything should "just work".
+This library attempts to poly-fill interesting parts of the
+[W3C File API](http://www.w3.org/TR/FileAPI/) in a seemless way. That is, you
+ought to be able to use the covered APIs in the W3C specified manner and
+everything should "just work".
 
-That said, this library doesn't attempt much. We just try to cover functionality that can be covered in a cross-browser fashion. Most of the tricky stuff we leave to braver folk.
+That said, this library doesn't attempt much. We just try to cover functionality
+that can be covered in a cross-browser fashion. Most of the tricky stuff we
+leave to braver folk.
 
-FileReader support in the browser is assumed. That is, the library is not written to poly-fill FileReader and requires it to function.
+## Assumptions / Scope
+
+FileReader support in the browser is assumed. That is, the library is not
+written to poly-fill FileReader and requires it to function.
+
+We also make the assumption that any browser sufficiently advanced enough to
+support FileReader is likely to also support the official specification for
+[XMLHTTPRequest](http://www.w3.org/TR/XMLHttpRequest/).
 
 ## Instructions
 
@@ -51,20 +63,27 @@ Safari 5             | no  | yes* | yes
 Internet Explorer 10 | no  | yes  | yes
 Internet Explorer 9  | no  | no   | no
 
-Note: Safari 5 supports an early version of Blob that cannot be directly constructed.
+Note: Safari 5 supports an early version of Blob that cannot be directly
+constructed.
 
 ## Test Scenarios
 
-When `grunt` executes these scenarios, it uses PhantomJS (a headless WebKit). As it stands, PhantomJS does not have full support for the W3C standards at issue.
+When `grunt` executes these scenarios, it uses PhantomJS (a headless WebKit). As
+it stands, PhantomJS does not have full support for the W3C standards at issue.
 
-As such, it is recommended that you manually run each test in Chrome or Firefox. The tests are authored such that they simulate non-conformance even in a fully-conforming browser.
+As such, it is recommended that you manually run each test in Chrome or Firefox.
+The tests are authored such that they simulate non-conformance even in a
+fully-conforming browser.
 
 1. URL, Blob and FileReader all fully conformant with W3C specifications
 2. as above but with URL either undefined or lacking create|revokeObjectURL
 3. as above but with Blob unable to be directly constructed
 
-The different `index.html` test files neuter the environment to test different levels of conformance. The shared `test.js` file is deliberately the same, so that the same tests are run across multiple browsers.
+The different `index.html` test files neuter the environment to test different
+levels of conformance. The shared `test.js` file is deliberately the same, so
+that the same tests are run across multiple browsers.
 
-It is also recommended that the tests be executed in the browsers listed above, for sanity.
+It is also recommended that the tests be executed in the browsers listed above,
+for sanity.
 
 

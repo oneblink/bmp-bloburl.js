@@ -14,12 +14,4 @@ suite('browser globals', function () {
   test('URL definition', function () {
     assert(URL.createObjectURL === BMP.URL.createObjectURL, 'using BMP\'s URL');
   });
-
-  test('Blob definition', function () {
-    assert(Blob !== BMP.Blob, 'using native Blob support');
-  });
-
-  test('FileReader definition', function () {
-    assert(FileReader !== BMP.FileReader, 'using native FileReader support');
-  });
 }); // END: suite('Require.JS', ...)
