@@ -6,12 +6,11 @@
 suite('browser globals', function () {
   'use strict';
   var URL = window.URL,
-    Blob = window.Blob,
-    FileReader = window.FileReader,
-    BMP = window.BMP,
-    $ = window.$;
+    BMP = window.BMP;
 
   test('URL definition', function () {
-    assert(URL !== BMP.URL, 'using native URL support');
+    assert(URL, 'using native URL support');
+    assert(URL.createObjectURL, 'using Blob URL support for create');
+    assert(URL.revokeObjectURL, 'using Blob URL support for revoke');
   });
 }); // END: suite('Require.JS', ...)

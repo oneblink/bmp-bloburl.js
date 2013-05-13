@@ -5,13 +5,9 @@
 
 suite('browser globals', function () {
   'use strict';
-  var URL = window.URL,
-    Blob = window.Blob,
-    FileReader = window.FileReader,
-    BMP = window.BMP,
-    $ = window.$;
+  var URL = window.URL
 
   test('URL definition', function () {
-    assert(URL.createObjectURL === BMP.URL.createObjectURL, 'using BMP\'s URL');
+    assert(!URL.createObjectURL, 'no native URL');
   });
 }); // END: suite('Require.JS', ...)
