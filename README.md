@@ -1,18 +1,18 @@
-# BMP Blob.JS
+# BMP Blobs.JS
 
-This library attempts to poly-fill interesting parts of the
-[W3C File API](http://www.w3.org/TR/FileAPI/) in a seemless way. That is, you
-ought to be able to use the covered APIs in the W3C specified manner and
-everything should "just work".
+This library makes available `window.BMP.blobs` and `window.BMP.Blob`.
 
-That said, this library doesn't attempt much. We just try to cover functionality
-that can be covered in a cross-browser fashion. Most of the tricky stuff we
-leave to braver folk.
+`window.BMP.blobs` is a singleton that makes it easy to put aside a potentially
+large blob and retrieve it later. It transparently makes use of native support
+for URL.createObjectURL and Blob URLs (if available).
+
+`window.BMP.Blob` is a constructor for a fallback implementation of the W3C Blob
+standard, with some additional convenient methods used to support BMP.blobs.
 
 ## Assumptions / Scope
 
-FileReader support in the browser is assumed. That is, the library is not
-written to poly-fill FileReader and requires it to function.
+FileReader support in the browser is assumed and BMP.Blobs requires it to
+function.
 
 We also make the assumption that any browser sufficiently advanced enough to
 support FileReader is likely to also support the official specification for
@@ -42,7 +42,7 @@ modules:
 
 You may want to do that regularly to keep the modules up to date.
 
-Lastly, to trigger the test and build progress, simply run:
+Lastly, to trigger the build progress, simply run:
 
     grunt
 
@@ -68,16 +68,12 @@ constructed.
 
 ## Test Scenarios
 
-When `grunt` executes these scenarios, it uses PhantomJS (a headless WebKit). As
-it stands, PhantomJS does not have full support for the W3C standards at issue.
-
-As such, it is recommended that you manually run each test in Chrome or Firefox.
+Each test in must be manually loaded into Chrome or Firefox.
 The tests are authored such that they simulate non-conformance even in a
 fully-conforming browser.
 
 1. URL, Blob and FileReader all fully conformant with W3C specifications
 2. as above but with URL either undefined or lacking create|revokeObjectURL
-3. as above but with Blob unable to be directly constructed
 
 The different `index.html` test files neuter the environment to test different
 levels of conformance. The shared `test.js` file is deliberately the same, so

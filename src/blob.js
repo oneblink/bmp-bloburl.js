@@ -6,7 +6,10 @@
   'use strict';
   var b, isConstructableBlob = true,
     Blob,
-    convertArrayBufferToBase64;
+    NestedBlob,
+    convertArrayBufferToBase64,
+    convertStringToArrayBuffer,
+    MIME = window.BMP.MIME;
 
   try {
     b = new window.Blob();
@@ -15,7 +18,7 @@
     isConstructableBlob = false;
   }
 
-  // //stackoverflow.com/questions/9267899/arraybuffer-to-base64-encoded-string
+  // http://stackoverflow.com/questions/9267899
   convertArrayBufferToBase64 = function (buffer) {
     var binary = '',
       bytes = new window.Uint8Array(buffer),
@@ -60,7 +63,7 @@
         datum = data[d];
         if (typeof datum === 'string') {
           this.size += datum.length;
-          if (this.type.indexOf('text/') === 0) {
+          if (MIME.isText(this.type)) {
             this.text += datum;
           } else {
             this.base64 += datum;
@@ -77,7 +80,7 @@
    * @param {Array} data Array of {ArrayBuffer|ArrayBufferView|Blob|String}.
    * @param {Object} [options] optional Object with "type" attribute
    */
-  Blob.create = function (data, options) {
+  Blob.createNative = function (data, options) {
     var builder;
     options = options || {};
     if (isConstructableBlob) {
@@ -100,8 +103,7 @@
     var xhr,
       blob;
 
-    if (window.URL === window.BMP.URL ||
-        window.URL.createObjectURL === window.BMP.URL.createObjectURL) {
+    if (!window.URL || !window.URL.createObjectURL) {
       this.fromNativeBlob(window.BMP.URL.retrieveObject(url), function (blob) {
         if (onSuccess && onSuccess instanceof Function) {
           onSuccess(blob);
@@ -128,7 +130,7 @@
     fr.onload = function (event) {
       fr.onload = null;
       try {
-        if (blob.type.indexOf('text/') === 0) {
+        if (MIME.isText(blob.type)) {
           blob = new Blob([event.target.result], { type: blob.type });
         } else {
           blob = Blob.fromDataURI(event.target.result);
@@ -149,7 +151,7 @@
       }
     };
     try {
-      if (blob.type.indexOf('text/') === 0) {
+      if (MIME.isText(blob.type)) {
         fr.readAsText(blob);
       } else {
         fr.readAsDataURL(blob);
@@ -182,7 +184,7 @@
     encoding = parts[1];
 
     if (encoding === 'base64') {
-      if (type.indexOf('text/') === 0) {
+      if (MIME.isText(type)) {
         blob.text = window.atob(data);
       } else {
         blob.base64 = data;
@@ -208,7 +210,8 @@
     xhr.onreadystatechange = function () {
       var mime,
         base64,
-        serializer;
+        serializer,
+        dataview;
 
       if (this.readyState === this.DONE) {
         this.onreadystatechange = null;
@@ -239,7 +242,11 @@
             blob = new Blob([base64], { type: mime });
 
           } else { // this.responseType === 'text'
-            blob = new Blob([this.response], { type: mime });
+            if (MIME.isText(mime)) {
+              blob = new Blob([this.response], { type: mime });
+            } else {
+              blob = new Blob([base64], { type: mime });
+            }
           }
           if (blob && onSuccess && onSuccess instanceof Function) {
             onSuccess(blob);
@@ -259,6 +266,50 @@
     xhr.send();
   };
 
+  /**
+   * @param {BMP.Blob} blob
+   */
+  Blob.isNested = function () {
+
+  };
+
+  /**
+   * @returns {Blob} a Base64-encoded BMP.Blob within a Blob
+   */
+  Blob.prototype.makeNested = function () {
+    var dataURI = 'data:';
+    dataURI += this.type;
+    if (MIME.isText(this.type)) {
+      dataURI += ',';
+      dataURI += this.text;
+    } else {
+      dataURI += ';base64,';
+      dataURI += this.base64;
+    }
+    this.type = 'text/plain';
+    this.text = dataURI;
+    this.base64 = null;
+  };
+
+  Blob.prototype.undoNested = function () {
+    var blob = Blob.fromDataURI(this.text);
+    this.type = blob.type;
+    if (MIME.isText(this.type)) {
+      this.text = blob.text;
+      this.base64 = null;
+    } else {
+      this.base64 = blob.base64;
+      this.text = null;
+    }
+  };
+
+  Blob.prototype.toNative = function () {
+    return window.BMP.Blob.createNative([this.base64 || this.text], {
+      type: this.type
+    });
+  };
+
   window.BMP = window.BMP || {};
   window.BMP.Blob = Blob;
+  window.BMP.NestedBlob = NestedBlob;
 }(this));

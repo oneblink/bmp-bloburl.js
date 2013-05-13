@@ -1,101 +1,149 @@
-/*global suite:true, test:true, setup:true, teardown:true*/ // mocha
+/*global suite:true, test:true, setup:true, teardown:true, suiteSetup:true,
+suiteTeardown:true*/ // mocha
 /*global assert:true*/ // chai
 /*jslint indent:2*/
 /*jslint browser:true, plusplus:true*/
 
-suite('BMP BlobURL poly-fill: URL', function () {
+suite('BMP MIME', function () {
   'use strict';
-  var URL = window.URL,
-    BMP = window.BMP,
-    $ = window.$,
-    convertStringToArrayBuffer;
+  var MIME = window.BMP.MIME;
 
-  // http://stackoverflow.com/questions/6965107
-  convertStringToArrayBuffer = function (str) {
-    var strLen = str.length,
-      buf = new window.ArrayBuffer(str.length * 2), // 2 bytes for each char
-      bufView = new window.Uint16Array(buf),
-      i;
-
-    for (i = 0; i < strLen; i++) {
-      bufView[i] = str.charCodeAt(i);
-    }
-    return buf;
-  };
-
-  test('URL.createObjectURL', function () {
-    assert(URL.createObjectURL, 'method itself is truthy / defined');
+  test('MIME.isText', function () {
+    assert(MIME.isText('text/plain'), 'text/plain');
+    assert(MIME.isText('application/json'), 'application/json');
+    assert(MIME.isText('application/javascript'), 'application/javascript');
+    assert(!MIME.isText('image/jpeg'), 'image/jpeg');
   });
 
-  test('URL.revokeObjectURL', function () {
-    assert(URL.revokeObjectURL, 'method itself is truthy / defined');
+}); // END: suite('BMP MIME'...)
+
+suite('BMP Blob', function () {
+  'use strict';
+  var BMP = window.BMP;
+
+  test('application/... with (un)nesting', function () {
+    var blob;
+    blob = new BMP.Blob(['123'], {type: 'application/octet-stream'});
+    assert.equal(blob.base64, '123');
+    assert.equal(blob.type, 'application/octet-stream');
+    blob.makeNested();
+    assert(!blob.base64, '.base64 should no longer be defined');
+    assert.equal(blob.text, 'data:application/octet-stream;base64,123');
+    assert.equal(blob.type, 'text/plain');
+    blob.undoNested();
+    assert(!blob.text, '.text should no longer be defined');
+    assert.equal(blob.base64, '123');
+    assert.equal(blob.type, 'application/octet-stream');
   });
 
-  test('create-retrieve flow with text Blob', function (done) {
-    var blob = BMP.Blob.create(['abc'], {type: 'text/plain'}),
-      uri;
+  test('text/plain with (un)nesting', function () {
+    var blob;
+    blob = new BMP.Blob(['123'], {type: 'text/plain'});
+    assert.equal(blob.text, '123', 'fresh BMP.Blob has text set');
+    assert.equal(blob.type, 'text/plain', 'fresh BMP.Blob has text set');
+    assert(!blob.base64, '.base64 should not be defined');
+    blob.makeNested();
+    assert.equal(blob.text, 'data:text/plain,123', 'post-nested blob.text');
+    assert.equal(blob.type, 'text/plain', 'post-nested blob.type');
+    assert(!blob.base64, '.base64 should not be defined');
+    blob.undoNested();
+    assert.equal(blob.text, '123', 'un-nested blob.text');
+    assert.equal(blob.type, 'text/plain', 'un-nested blob.type');
+    assert(!blob.base64, '.base64 should not be defined');
+  });
 
-    uri = URL.createObjectURL(blob);
-    assert(typeof uri === 'string', 'URL.createObjectURL returns a string');
-    window.BMP.Blob.fromBlobURL(uri, function (blob) {
-      assert(blob.text === 'abc', 'retrieved Blob has matching contents');
-      done();
-    }, function (error) {
-      assert(false, 'request for Blob should not result in HTTP 500');
-      done();
+}); // END: suite('BMP Blob'...)
+
+suite('BMP.blobs', function () {
+  'use strict';
+  var BMP = window.BMP;
+
+  test('BMP.blobs is globally accessible', function () {
+    assert(window.BMP.blobs, '');
+  });
+
+  suite('text/... blob', function () {
+    var blob, url;
+
+    suiteSetup(function () {
+      blob = BMP.Blob.createNative(['abc'], {type: 'text/plain'});
+    });
+
+    test('"save" returns a string', function (done) {
+      BMP.blobs.save(blob, function (blobURL) { // onSuccess
+        assert(true, 'should not return with an error');
+        assert.equal(typeof blobURL, 'string', 'blobURL is a string');
+        url = blobURL;
+        done();
+      }, function (err) { // onError
+        assert(false, 'should not return with an error');
+        done(err);
+      });
+    });
+
+    test('"get" returns BMP.Blob', function (done) {
+      BMP.blobs.get(url, function (blob) { // onSuccess
+        assert(true, 'should not return with an error');
+        assert(blob instanceof BMP.Blob, 'blob is a BMP.Blob');
+        assert.equal(blob.type, 'text/plain', 'correct type was retrieved');
+        assert.equal(blob.text, 'abc', 'correct text was retrieved');
+        assert(!blob.base64, 'no base64 defined');
+        done();
+      }, function (err) { // onError
+        assert(false, 'should not return with an error');
+        done(err);
+      });
     });
   });
 
-  test('create-revoke flow with text Blob', function (done) {
-    var blob = BMP.Blob.create(['abc'], {type: 'text/plain'}),
-      uri;
+  suite('binary blob: test/pixel.png', function () {
+    var blob, url, base64;
 
-    uri = URL.createObjectURL(blob);
-    URL.revokeObjectURL(uri);
-    window.BMP.Blob.fromBlobURL(uri, function (blob) {
-      assert(false, 'request for Blob should not result in HTTP 200');
-      done();
-    }, function (error) {
-      assert(true, 'request for Blob results in failure');
-      done();
+    suiteSetup(function (done) {
+      var input;
+      this.timeout(30 * 1000);
+      base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVQI12P4DwABAQEAG7buVgAAAABJRU5ErkJggg==';
+      blob = BMP.Blob.createNative([window.atob(base64)], {type: 'image/png'});
+      window.alert('use the file picker to select text/pixel.png');
+      input = window.document.createElement('input');
+      input.type = 'file';
+      window.document.body.appendChild(input);
+      input.onchange = function (event) {
+        if (input.files && input.files.length) {
+          input.onchange = null;
+          window.document.body.removeChild(input);
+          blob = input.files[0];
+          done();
+        }
+      };
     });
+
+    test('"save" returns a string', function (done) {
+      BMP.blobs.save(blob, function (blobURL) { // onSuccess
+        assert(true, 'should not return with an error');
+        assert.equal(typeof blobURL, 'string', 'blobURL is a string');
+        url = blobURL;
+        done();
+      }, function (err) { // onError
+        assert(false, 'should not return with an error');
+        done(err);
+      });
+    });
+
+    test('"get" returns BMP.Blob', function (done) {
+      BMP.blobs.get(url, function (blob) { // onSuccess
+        assert(true, 'should not return with an error');
+        assert(blob instanceof BMP.Blob, 'blob is a BMP.Blob');
+        assert.equal(blob.type, 'image/png', 'correct type was retrieved');
+        assert.equal(blob.base64, base64, 'correct text was retrieved');
+        assert(!blob.text, 'no text defined');
+        done();
+      }, function (err) { // onError
+        assert(false, 'should not return with an error');
+        done(err);
+      });
+    });
+
   });
 
-  /** this test breaks in Chrome, don't know what Blobs become responseText
-  test('create-retrieve flow with JSON Blob', function (done) {
-    var blob = BMP.Blob.create(['{"key":"value"}'], {type: 'application/json'}),
-      uri;
-
-    uri = URL.createObjectURL(blob);
-    assert(typeof uri === 'string', 'URL.createObjectURL returns a string');
-    window.BMP.Blob.fromBlobURL(uri, function (blob) {
-      var base64 = window.btoa('{"key":"value"}');
-      assert.equal(blob.base64, base64, 'retrieved Blob has matching contents');
-      done();
-    }, function (error) {
-      assert(false, 'request for Blob should not result in HTTP 500');
-      done();
-    });
-  });
-   */
-
-  /** this test breaks non-native URL
-  test('create-retrieve flow with JSON Blob', function (done) {
-    var data = convertStringToArrayBuffer('{"key":"value"}'),
-      blob = BMP.Blob.create([data], {type: 'application/json'}),
-      uri;
-
-    uri = URL.createObjectURL(blob);
-    assert(typeof uri === 'string', 'URL.createObjectURL returns a string');
-    window.BMP.Blob.fromBlobURL(uri, function (blob) {
-      var base64 = window.btoa('{"key":"value"}');
-      assert.equal(blob.base64, base64, 'retrieved Blob has matching contents');
-      done();
-    }, function (error) {
-      assert(false, 'request for Blob should not result in HTTP 500');
-      done();
-    });
-  });
-   */
-
-}); // END: suite('Require.JS', ...)
+});

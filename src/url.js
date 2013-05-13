@@ -5,7 +5,8 @@
 (function (window) {
   'use strict';
 
-  var URL = {},
+  var BMP = window.BMP,
+    URL = {},
     generateUUID,
     blobs = {}; // in-memory storage
 
@@ -47,7 +48,4 @@
 
   window.BMP = window.BMP || {};
   window.BMP.URL = URL;
-  window.URL = window.URL || URL;
-  window.URL.createObjectURL = window.URL.createObjectURL || URL.createObjectURL;
-  window.URL.revokeObjectURL = window.URL.revokeObjectURL || URL.revokeObjectURL;
 }(this));

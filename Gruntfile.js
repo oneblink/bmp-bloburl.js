@@ -13,12 +13,11 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-requirejs');
   grunt.loadNpmTasks('grunt-jslint');
-  grunt.loadNpmTasks('grunt-mocha');
 
   grunt.initConfig({
     clean: {
       options: {
-        src: ['bmp-bloburl.*']
+        src: ['bmp-blobs.*']
       }
     },
 
@@ -48,35 +47,28 @@ module.exports = function (grunt) {
     concat: {
       dist: {
         src: [
+          'src/url.js',
+          'src/mime.js',
           'src/blob.js',
-          'src/url.js'
+          'src/blobs.js'
         ],
-        dest: 'bmp-bloburl.js'
+        dest: 'bmp-blobs.js'
       }
     },
 
     uglify: {
       'default': {
         files: {
-          'bmp-bloburl.min.js': ['bmp-bloburl.js']
+          'bmp-blobs.min.js': ['bmp-blobs.js']
         }
       },
       options: {
-        sourceMap: 'bmp-bloburl.js.map',
+        sourceMap: 'bmp-blobs.js.map',
         preserveComments: 'some',
         beautify: {
           max_line_len: 80
         },
         compress: {}
-      }
-    },
-
-    mocha: {
-      all: {
-        src: ['test/*/index.html'],
-        options: {
-          run: false
-        }
       }
     }
 
@@ -86,8 +78,7 @@ module.exports = function (grunt) {
     'jslint',
     'clean',
     'concat',
-    'uglify',
-    'mocha'
+    'uglify'
   ]);
 
   grunt.registerTask('build', [
