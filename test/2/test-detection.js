@@ -8,6 +8,6 @@ suite('browser globals', function () {
   var URL = window.URL
 
   test('URL definition', function () {
-    assert(!URL.createObjectURL, 'no native URL');
+    assert(!URL || !URL.createObjectURL, 'no native URL');
   });
 }); // END: suite('Require.JS', ...)

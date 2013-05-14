@@ -21,7 +21,11 @@
       var nativeBlob;
       bmpBlob.makeNested();
       nativeBlob = bmpBlob.toNative();
-      successFn(window.URL.createObjectURL(nativeBlob));
+      if (!window.URL || !window.URL.createObjectURL) {
+        successFn(window.BMP.URL.createObjectURL(nativeBlob));
+      } else {
+        successFn(window.URL.createObjectURL(nativeBlob));
+      }
     }, function (err) { // onError
       errorFn(err);
     });
