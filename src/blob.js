@@ -98,15 +98,14 @@
     var xhr,
       blob;
 
+    onSuccess = onSuccess || function () {};
+    onError = onError || function () {};
+
     if (!window.URL || !window.URL.createObjectURL) {
       this.fromNativeBlob(window.BMP.URL.retrieveObject(url), function (blob) {
-        if (onSuccess && onSuccess instanceof Function) {
-          onSuccess(blob);
-        }
+        onSuccess(blob);
       }, function (err) {
-        if (onError && onError instanceof Function) {
-          onError(err);
-        }
+        onError(err);
       });
 
     } else { // native URL.createObjectURL, therefore use XMLHTTPRequest
@@ -122,35 +121,34 @@
   Blob.fromNativeBlob = function (blob, onSuccess, onError) {
     var fr = new window.FileReader();
 
+    onSuccess = onSuccess || function () {};
+    onError = onError || function () {};
+
     fr.onload = function (event) {
       var result;
       fr.onload = null;
       try {
         result = event.target.result;
         blob = Blob.fromDataURI(event.target.result);
-        if (onSuccess && onSuccess instanceof Function) {
-          onSuccess(blob);
+        if (!blob) {
+          throw new Error('Blob.fromNativeBlob: fromDataURI gave no blob');
         }
       } catch (err) {
-        if (onError && onError instanceof Function) {
-          onError(err);
-        }
+        onError(err);
+        return;
       }
+      onSuccess(blob);
     };
     fr.onerror = function (event) {
       fr.onerror = null;
-      if (onError && onError instanceof Function) {
-        onError(event.target.error);
-      }
+      onError(event.target.error);
     };
     try {
       fr.readAsDataURL(blob);
     } catch (err) {
       fr.onload = null;
       fr.onerror = null;
-      if (onError && onError instanceof Function) {
-        onError(err);
-      }
+      onError(err);
     }
   };
 
@@ -199,6 +197,9 @@
     var xhr,
       blob;
 
+    onSuccess = onSuccess || function () {};
+    onError = onError || function () {};
+
     xhr = new window.XMLHttpRequest();
     xhr.onreadystatechange = function () {
       var mime,
@@ -215,13 +216,9 @@
 
           } else if (this.responseType === 'blob') {
             Blob.fromNativeBlob(this.response, function (blob) {
-              if (onSuccess && onSuccess instanceof Function) {
-                onSuccess(blob);
-              }
+              onSuccess(blob);
             }, function (err) {
-              if (onError && onError instanceof Function) {
-                onError(err);
-              }
+              onError(err);
             });
 
           } else if (this.responseType === 'document') {
@@ -236,17 +233,14 @@
           } else { // this.responseType === 'text'
             blob = new Blob([this.response], { type: mime });
           }
-          if (blob && onSuccess && onSuccess instanceof Function) {
+          if (blob) {
             onSuccess(blob);
-          }
-          if (!blob && onError && onError instanceof Function) {
+          } else {
             onError(new Error('error retrieving target Blob via Blob URL'));
           }
 
         } else { // status === 500
-          if (onError && onError instanceof Function) {
-            onError(new Error(this.responseText));
-          }
+          onError(new Error(this.url + ' -> ' + this.status));
         }
       }
     };
