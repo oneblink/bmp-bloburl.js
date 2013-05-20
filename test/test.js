@@ -19,37 +19,39 @@ suite('BMP MIME', function () {
 
 suite('BMP Blob', function () {
   'use strict';
-  var BMP = window.BMP;
+  var BMP = window.BMP,
+    base64 = window.btoa('123'); // "MTIz"
 
   test('application/... with (un)nesting', function () {
     var blob;
-    blob = new BMP.Blob(['123'], {type: 'application/octet-stream'});
-    assert.equal(blob.base64, '123');
+    blob = new BMP.Blob([base64], {type: 'application/octet-stream'});
+    assert.equal(blob.base64, base64, 'fresh BMP.Blob has base64 set');
     assert.equal(blob.type, 'application/octet-stream');
+    assert(!blob.text, '.test should not be defined');
     blob.makeNested();
     assert(!blob.base64, '.base64 should no longer be defined');
-    assert.equal(blob.text, 'data:application/octet-stream;base64,123');
+    assert.equal(blob.text, 'data:application/octet-stream;base64,' + base64);
     assert.equal(blob.type, 'text/plain');
     blob.undoNested();
     assert(!blob.text, '.text should no longer be defined');
-    assert.equal(blob.base64, '123');
+    assert.equal(blob.base64, base64);
     assert.equal(blob.type, 'application/octet-stream');
   });
 
   test('text/plain with (un)nesting', function () {
     var blob;
-    blob = new BMP.Blob(['123'], {type: 'text/plain'});
-    assert.equal(blob.text, '123', 'fresh BMP.Blob has text set');
+    blob = new BMP.Blob([base64], {type: 'text/plain'});
+    assert.equal(blob.base64, base64, 'fresh BMP.Blob has base64 set');
     assert.equal(blob.type, 'text/plain', 'fresh BMP.Blob has text set');
-    assert(!blob.base64, '.base64 should not be defined');
+    assert(!blob.text, '.test should not be defined');
     blob.makeNested();
-    assert.equal(blob.text, 'data:text/plain,123', 'post-nested blob.text');
+    assert.equal(blob.text, 'data:text/plain;base64,' + base64, 'post-nested blob.text');
     assert.equal(blob.type, 'text/plain', 'post-nested blob.type');
     assert(!blob.base64, '.base64 should not be defined');
     blob.undoNested();
-    assert.equal(blob.text, '123', 'un-nested blob.text');
+    assert.equal(blob.base64, base64, 'un-nested blob.base64');
     assert.equal(blob.type, 'text/plain', 'un-nested blob.type');
-    assert(!blob.base64, '.base64 should not be defined');
+    assert(!blob.text, '.text should not be defined');
   });
 
 }); // END: suite('BMP Blob'...)
@@ -63,16 +65,17 @@ suite('BMP.blobs', function () {
   });
 
   suite('text/... blob', function () {
-    var blob, url;
+    var blob, url, base64;
 
     suiteSetup(function () {
+      base64 = window.btoa('abc'); // "YWJj"
       blob = BMP.Blob.createNative(['abc'], {type: 'text/plain'});
     });
 
     test('"save" returns a string', function (done) {
       BMP.blobs.save(blob, function (blobURL) { // onSuccess
         assert(true, 'should not return with an error');
-        assert.equal(typeof blobURL, 'string', 'blobURL is a string');
+        assert.isString(blobURL, 'blobURL is a string');
         url = blobURL;
         done();
       }, function (err) { // onError
@@ -86,8 +89,8 @@ suite('BMP.blobs', function () {
         assert(true, 'should not return with an error');
         assert(blob instanceof BMP.Blob, 'blob is a BMP.Blob');
         assert.equal(blob.type, 'text/plain', 'correct type was retrieved');
-        assert.equal(blob.text, 'abc', 'correct text was retrieved');
-        assert(!blob.base64, 'no base64 defined');
+        assert.equal(blob.base64, base64, 'correct base64 was retrieved');
+        assert.equal(window.atob(blob.base64), 'abc');
         done();
       }, function (err) { // onError
         assert(false, 'should not return with an error');
@@ -103,7 +106,7 @@ suite('BMP.blobs', function () {
       var input;
       this.timeout(30 * 1000);
       base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVQI12P4DwABAQEAG7buVgAAAABJRU5ErkJggg==';
-      blob = BMP.Blob.createNative([window.atob(base64)], {type: 'image/png'});
+      blob = BMP.Blob.createNative([base64], {type: 'image/png'});
       window.alert('use the file picker to select text/pixel.png');
       input = window.document.createElement('input');
       input.type = 'file';

@@ -9,16 +9,25 @@
 
   /**
    * emulates (and uses, if available) native URL.createObjectURL
-   * @param {Blob|String} blob
+   * @param {BMP.Blob|Blob|String} blob
    * @param {Function} onSuccess: function (blobURL)
    * @param {Function} onError: function (err)
+   * @return {String} blobURL (only if given a BMP.Blob).
    */
   blobs.save = function (blob, onSuccess, onError) {
-    var successFn, errorFn;
+    var successFn, errorFn, nativeBlob;
+    if (blob instanceof window.BMP.Blob) {
+      blob.makeNested();
+      nativeBlob = blob.toNative();
+      if (!window.URL || !window.URL.createObjectURL) {
+        return window.BMP.URL.createObjectURL(nativeBlob);
+      }
+      return window.URL.createObjectURL(nativeBlob);
+    }
+    // handle native blob below
     successFn = onSuccess || function () {};
     errorFn = onError || function () {};
     window.BMP.Blob.fromNativeBlob(blob, function (bmpBlob) { // onSuccess
-      var nativeBlob;
       bmpBlob.makeNested();
       nativeBlob = bmpBlob.toNative();
       if (!window.URL || !window.URL.createObjectURL) {
@@ -37,7 +46,7 @@
    * @param {Function} onError: function (err)
    */
   blobs.get = function (blobURL, onSuccess, onError) {
-    var successFn, errorFn, blob;
+    var successFn, errorFn;
     successFn = onSuccess || function () {};
     errorFn = onError || function () {};
     window.BMP.Blob.fromBlobURL(blobURL, function (blob) { // onSuccess
