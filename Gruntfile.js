@@ -49,8 +49,8 @@ module.exports = function (grunt) {
         src: [
           'src/url.js',
           'src/mime.js',
-          'src/blob.js',
-          'src/blobs.js'
+          'src/blob.js'/*,
+          'src/blobs.js'*/
         ],
         dest: 'bmp-blobs.js'
       }

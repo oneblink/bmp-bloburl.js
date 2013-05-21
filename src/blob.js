@@ -276,7 +276,7 @@
   };
 
   Blob.prototype.toNative = function () {
-    return window.BMP.Blob.createNative([this.base64 || this.text], {
+    return window.BMP.Blob.createNative([window.atob(this.base64)], {
       type: this.type
     });
   };

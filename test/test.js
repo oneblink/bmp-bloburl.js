@@ -56,6 +56,7 @@ suite('BMP Blob', function () {
 
 }); // END: suite('BMP Blob'...)
 
+/* not using BMP.blobs anymore, so don't bother testing it
 suite('BMP.blobs', function () {
   'use strict';
   var BMP = window.BMP;
@@ -150,3 +151,4 @@ suite('BMP.blobs', function () {
   });
 
 });
+*/

@@ -37,6 +37,13 @@
     return blobs[key];
   };
 
+  /**
+   * non-W3C standard, but used for our implementation
+   */
+  URL.revokeAllObjectURLs = function () {
+    blobs = {};
+  };
+
   generateUUID = function () {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       /*jslint bitwise:true*/
