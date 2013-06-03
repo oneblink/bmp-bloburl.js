@@ -189,6 +189,22 @@
   };
 
   /**
+   * @returns {String}
+   */
+  Blob.prototype.toDataURI = function () {
+    var head, uri;
+    head = 'data:' + this.type;
+    if (this.base64) {
+      head += ';base64,';
+      uri = head + this.base64;
+    } else {
+      head += ',';
+      uri = head + this.text;
+    }
+    return uri;
+  };
+
+  /**
    * @param {String} url
    * @param {Function} onSuccess function({BMP.Blob} blob)
    * @param {Function} onError function({Error} error)
@@ -253,6 +269,20 @@
    */
   Blob.isNested = function () {
 
+  };
+
+  Blob.prototype.decode64 = function () {
+    if (!this.text && this.base64 && MIME.isText(this.type)) {
+      this.text = window.atob(this.base64);
+      this.base64 = null;
+    }
+  };
+
+  Blob.prototype.encode64 = function () {
+    if (this.text && !this.base64) {
+      this.base64 = window.btoa(this.text);
+      this.text = null;
+    }
   };
 
   /**
