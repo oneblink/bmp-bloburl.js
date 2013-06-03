@@ -13,6 +13,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-requirejs');
   grunt.loadNpmTasks('grunt-jslint');
+  grunt.loadNpmTasks('grunt-mocha');
 
   grunt.initConfig({
     clean: {
@@ -70,15 +71,32 @@ module.exports = function (grunt) {
         },
         compress: {}
       }
-    }
+    },
 
+    mocha: {
+      all: {
+        src: [
+          'test/**/*.html',
+          '!test/1/index.html' // this test needs stuff that isn't in PhantomJS
+        ],
+        mocha: {}
+      }
+    },
+
+    watch: {
+      gruntfile: {
+        files: '<%= jslint.files %>',
+        tasks: ['test'],
+        options: {
+          interrupt: true
+        }
+      }
+    }
   });
 
   grunt.registerTask('default', [
-    'jslint',
-    'clean',
-    'concat',
-    'uglify'
+    'test',
+    'build'
   ]);
 
   grunt.registerTask('build', [
@@ -86,5 +104,11 @@ module.exports = function (grunt) {
     'concat',
     'uglify'
   ]);
+
+  grunt.registerTask('test', [
+    'jslint',
+    'mocha'
+  ]);
+
 };
 
