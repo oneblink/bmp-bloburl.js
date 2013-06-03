@@ -1,3 +1,4 @@
+/*jslint indent:2*/
 (function (window) {
   'use strict';
   var BMP,

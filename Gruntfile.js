@@ -27,18 +27,7 @@ module.exports = function (grunt) {
         'src/*.js'
       ],
       directives: {
-        browser: true,
-        es5: true,
-        nomen: true,
-        sloppy: true, // allow skipping ES5 'use strict'
-        todo: true,
-        indent: 2,
-        predef: [
-          // pre-defined globals
-          'module',
-          'define',
-          'require'
-        ]
+        todo: true // TODO: eventually get rid of this
       },
       options: {
         failOnError: true
