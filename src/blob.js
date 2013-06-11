@@ -178,13 +178,6 @@
     blob.type = type;
     blob.size = data.length;
 
-    try {
-      blob = Blob.fromDataURI(window.atob(blob.base64));
-      blob.makeNested();
-    } catch (err) {
-      // do nothing, let original blob be returned
-    }
-
     return blob;
   };
 

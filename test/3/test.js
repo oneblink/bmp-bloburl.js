@@ -68,10 +68,18 @@ suite('BMP.FileInput', function () {
   }); // END: suite('with no selected Files'...)
 
   suite('with a simulated selected File', function () {
-    var $input, fileInput, stub;
+    var $input, fileInput, stub, assertBlob, base64;
+
+    assertBlob = function (blob) {
+      assert.isObject(blob);
+      assert.instanceOf(blob, BMP.Blob);
+      assert.equal(blob.type, 'image/png');
+      assert.equal(blob.base64, base64);
+      assert(!blob.text);
+    };
 
     setup(function () {
-      var base64, data, nativeBlob;
+      var data, nativeBlob;
       $input = $('<input type="file" />').appendTo(document.body);
       $input.trigger('click');
       fileInput = $input.data('fileInput');
@@ -97,8 +105,7 @@ suite('BMP.FileInput', function () {
     test('fileInput.getBlob() returns BMP.Blob', function (done) {
       fileInput.getBlob().then(function (blob) { //onSuccess
         assert(true, 'promise was resolved');
-        assert.isObject(blob);
-        assert.instanceOf(blob, BMP.Blob);
+        assertBlob(blob);
         done();
       }, function (error) { //onError
         assert.fail(true, false, 'promise was rejected');
@@ -109,8 +116,7 @@ suite('BMP.FileInput', function () {
     test('fileInput.getBlob(0) returns BMP.Blob', function (done) {
       fileInput.getBlob(0).then(function (blob) { //onSuccess
         assert(true, 'promise was resolved');
-        assert.isObject(blob);
-        assert.instanceOf(blob, BMP.Blob);
+        assertBlob(blob);
         done();
       }, function (error) { //onError
         assert.fail(true, false, 'promise was rejected');
