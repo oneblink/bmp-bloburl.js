@@ -6,7 +6,6 @@
   'use strict';
   var b, isConstructableBlob = true,
     Blob,
-    NestedBlob,
     convertArrayBufferToBase64,
     convertStringToArrayBuffer,
     MIME = window.BMP.MIME;
@@ -306,5 +305,4 @@
 
   window.BMP = window.BMP || {};
   window.BMP.Blob = Blob;
-  window.BMP.NestedBlob = NestedBlob;
 }(this));

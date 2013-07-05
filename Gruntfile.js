@@ -67,7 +67,8 @@ module.exports = function (grunt) {
       all: {
         src: [
           'test/**/*.html',
-          '!test/1/index.html' // this test needs stuff that isn't in PhantomJS
+          '!test/1/index.html', // this test needs stuff that isn't in PhantomJS
+          '!test/3/index.html' // this test needs stuff that isn't in PhantomJS
         ],
         mocha: {}
       }
